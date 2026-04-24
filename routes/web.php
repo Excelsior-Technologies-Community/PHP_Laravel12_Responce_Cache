@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\CacheController;
 
 Route::get('/', function () {
     return response()->json([
@@ -10,3 +10,5 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/cache-dashboard', [CacheController::class, 'index']);
+Route::get('/cache-clear', [CacheController::class, 'clear']);
