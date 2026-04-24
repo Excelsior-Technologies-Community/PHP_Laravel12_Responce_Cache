@@ -205,7 +205,10 @@ You successfully created a **Laravel 12 Response Cache Project** using
 -   Cache clearing
 -   Folder structure explanation
 
+<<<<<<< HEAD
 
 
 
 
+=======
+>>>>>>> development

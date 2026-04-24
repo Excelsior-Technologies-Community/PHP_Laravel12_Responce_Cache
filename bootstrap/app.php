@@ -12,10 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Apply Response Cache middleware to all web routes
         $middleware->web(append: [
-            CacheResponse::class,
+            \Spatie\ResponseCache\Middlewares\CacheResponse::class,
+            \App\Http\Middleware\SmartCacheMiddleware::class,
+            \App\Http\Middleware\CacheLogMiddleware::class,
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
