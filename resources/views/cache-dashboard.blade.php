@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Cache Dashboard</title>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -17,7 +16,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-
             background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
         }
 
@@ -25,17 +23,13 @@
             width: 520px;
             padding: 35px;
             border-radius: 20px;
-
             background: rgba(255, 255, 255, 0.10);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
-
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-
             color: white;
             text-align: center;
-
             position: relative;
             overflow: hidden;
         }
@@ -47,12 +41,10 @@
         }
 
         @keyframes float {
-
             0%,
             100% {
                 transform: translateY(0);
             }
-
             50% {
                 transform: translateY(-6px);
             }
@@ -79,10 +71,9 @@
             font-size: 13px;
         }
 
-        /* STATS GRID */
         .stats {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin: 20px 0;
         }
@@ -108,17 +99,20 @@
             color: #00ffcc;
         }
 
+        .chart-wrapper {
+            width: 100%;
+            max-width: 220px;
+            margin: 20px auto;
+        }
+
         .btn {
             display: inline-block;
             padding: 14px 28px;
             border-radius: 14px;
-
             background: linear-gradient(135deg, #ff512f, #dd2476);
             color: white;
-
             text-decoration: none;
             font-weight: bold;
-
             box-shadow: 0 10px 30px rgba(221, 36, 118, 0.4);
             transition: 0.3s;
         }
@@ -152,20 +146,15 @@
 </head>
 
 <body>
-
     <div class="card">
-
         <div class="icon">⚡</div>
-
         <h2>Cache Control Center</h2>
         <p><span class="dot"></span>Live Laravel Performance Dashboard</p>
 
-        {{-- SUCCESS --}}
         @if(session()->has('success'))
             <div class="success" id="msg">
                 {{ session('success') }}
             </div>
-
             <script>
                 setTimeout(() => {
                     document.getElementById('msg').style.display = 'none';
@@ -173,39 +162,72 @@
             </script>
         @endif
 
-        {{-- STATS --}}
         <div class="stats">
-
             <div class="box">
-                📦 Cache Files
+                📦 Files
                 <div class="value">{{ $cacheFiles }}</div>
             </div>
-
             <div class="box">
-                ⚡ Cache Status
-                <div class="value">ACTIVE</div>
+                🎯 Hits
+                <div class="value" style="color: #22c55e;">{{ $stats['hits'] }}</div>
             </div>
-
+            <div class="box">
+                ❌ Misses
+                <div class="value" style="color: #ef4444;">{{ $stats['misses'] }}</div>
+            </div>
+            <div class="box">
+                ⚡ Status
+                <div class="value" style="font-size: 16px;">ACTIVE</div>
+            </div>
             <div class="box">
                 🧠 Laravel
-                <div class="value">{{ $laravel }}</div>
+                <div class="value" style="font-size: 16px;">{{ $laravel }}</div>
             </div>
-
             <div class="box">
                 🐘 PHP
-                <div class="value">{{ $php }}</div>
+                <div class="value" style="font-size: 16px;">{{ $php }}</div>
             </div>
-
         </div>
 
-        <a href="/cache-clear" class="btn">Clear Cache</a>
+        <div class="chart-wrapper">
+            <canvas id="cacheChart"></canvas>
+        </div>
+
+        <a href="/clear" class="btn">Clear Cache</a>
 
         <div class="footer">
             Laravel Response Cache • Live System Dashboard
         </div>
-
     </div>
 
+    <script>
+        const ctx = document.getElementById('cacheChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Cache Hits', 'Cache Misses'],
+                datasets: [{
+                    data: [{{ $stats['hits'] }}, {{ $stats['misses'] }}],
+                    backgroundColor: ['#22c55e', '#ef4444'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {
+                                family: "'Segoe UI', sans-serif",
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    </script>
 </body>
-
 </html>
